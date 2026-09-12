@@ -253,6 +253,139 @@ INSERT INTO `train` VALUES (1,'12701','Hussain Sagar Express',1200,'Express'),(2
 UNLOCK TABLES;
 
 --
+-- Dumping routines for database 'railway_reservation'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `book_ticket` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `book_ticket`(
+    IN p_passenger_id INT,
+    IN p_train_id INT,
+    IN p_journey_date DATE,
+    IN p_seat_number VARCHAR(10),
+    IN p_travel_class VARCHAR(30)
+)
+BEGIN
+    DECLARE seat_count INT;
+
+    SELECT COUNT(*)
+    INTO seat_count
+    FROM RESERVATION
+    WHERE train_id = p_train_id
+      AND journey_date = p_journey_date
+      AND seat_number = p_seat_number
+      AND status = 'Confirmed';
+
+    IF seat_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Seat is already booked';
+    ELSE
+        INSERT INTO RESERVATION
+        (passenger_id, train_id, journey_date, seat_number, travel_class, status)
+        VALUES
+        (p_passenger_id, p_train_id, p_journey_date,
+         p_seat_number, p_travel_class, 'Confirmed');
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `cancel_reservation` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cancel_reservation`(
+    IN p_reservation_id INT
+)
+BEGIN
+    UPDATE RESERVATION
+    SET status = 'Cancelled'
+    WHERE reservation_id = p_reservation_id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `find_trains` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `find_trains`(
+    IN source_station VARCHAR(100),
+    IN destination_station VARCHAR(100)
+)
+BEGIN
+    SELECT DISTINCT
+        t.train_number,
+        t.train_name
+    FROM TRAIN t
+    JOIN ROUTE r1
+        ON t.train_id = r1.train_id
+    JOIN ROUTE r2
+        ON t.train_id = r2.train_id
+    JOIN STATION s1
+        ON r1.station_id = s1.station_id
+    JOIN STATION s2
+        ON r2.station_id = s2.station_id
+    WHERE s1.station_name = source_station
+      AND s2.station_name = destination_station
+      AND r1.stop_number < r2.stop_number;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `generate_ticket` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `generate_ticket`(
+    IN p_reservation_id INT,
+    IN p_ticket_number VARCHAR(30),
+    IN p_fare DECIMAL(10,2)
+)
+BEGIN
+    INSERT INTO TICKET
+    (reservation_id, ticket_number, fare, booking_date)
+    VALUES
+    (p_reservation_id, p_ticket_number, p_fare, CURDATE());
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
 -- Final view structure for view `confirmed_bookings`
 --
 
@@ -297,4 +430,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-05 10:56:57
+-- Dump completed on 2026-09-12 19:18:22
