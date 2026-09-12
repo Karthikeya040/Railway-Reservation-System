@@ -1,271 +1,268 @@
--- MySQL dump 10.13  Distrib 8.0.45, for Win64 (x86_64)
---
--- Host: localhost    Database: railway_reservation
--- ------------------------------------------------------
--- Server version	8.0.45
+-- RAILWAY RESERVATION SYSTEM
+-- MySQL DBMS Project - Complete SQL Script
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- 1. DATABASE
+CREATE DATABASE railway_reservation;
+USE railway_reservation;
 
---
--- Temporary view structure for view `confirmed_bookings`
---
+-- 2. TABLES
+CREATE TABLE PASSENGER (
+    passenger_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    phone VARCHAR(15),
+    age INT,
+    gender VARCHAR(10)
+);
 
-DROP TABLE IF EXISTS `confirmed_bookings`;
-/*!50001 DROP VIEW IF EXISTS `confirmed_bookings`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `confirmed_bookings` AS SELECT 
- 1 AS `reservation_id`,
- 1 AS `passenger_name`,
- 1 AS `train_number`,
- 1 AS `train_name`,
- 1 AS `journey_date`,
- 1 AS `seat_number`,
- 1 AS `travel_class`,
- 1 AS `status`*/;
-SET character_set_client = @saved_cs_client;
+CREATE TABLE TRAIN (
+    train_id INT PRIMARY KEY,
+    train_number VARCHAR(20) NOT NULL,
+    train_name VARCHAR(100) NOT NULL,
+    total_seats INT NOT NULL,
+    train_type VARCHAR(50)
+);
 
---
--- Table structure for table `passenger`
---
+CREATE TABLE STATION (
+    station_id INT PRIMARY KEY,
+    station_name VARCHAR(100) NOT NULL,
+    station_code VARCHAR(10) NOT NULL,
+    city VARCHAR(100),
+    state VARCHAR(100)
+);
 
-DROP TABLE IF EXISTS `passenger`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `passenger` (
-  `passenger_id` int NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `phone` varchar(15) DEFAULT NULL,
-  `age` int DEFAULT NULL,
-  `gender` varchar(10) DEFAULT NULL,
-  PRIMARY KEY (`passenger_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TABLE ROUTE (
+    route_id INT PRIMARY KEY,
+    train_id INT NOT NULL,
+    station_id INT NOT NULL,
+    stop_number INT,
+    arrival_time TIME,
+    departure_time TIME,
+    FOREIGN KEY (train_id) REFERENCES TRAIN(train_id),
+    FOREIGN KEY (station_id) REFERENCES STATION(station_id)
+);
 
---
--- Dumping data for table `passenger`
---
+CREATE TABLE RESERVATION (
+    reservation_id INT PRIMARY KEY AUTO_INCREMENT,
+    passenger_id INT NOT NULL,
+    train_id INT NOT NULL,
+    journey_date DATE NOT NULL,
+    seat_number VARCHAR(10),
+    travel_class VARCHAR(30),
+    status VARCHAR(20),
+    FOREIGN KEY (passenger_id) REFERENCES PASSENGER(passenger_id),
+    FOREIGN KEY (train_id) REFERENCES TRAIN(train_id)
+);
 
-LOCK TABLES `passenger` WRITE;
-/*!40000 ALTER TABLE `passenger` DISABLE KEYS */;
-INSERT INTO `passenger` VALUES (1,'Rahul Sharma','rahul@gmail.com','9876543210',25,'Male'),(2,'Priya Reddy','priya@gmail.com','9876543211',22,'Female'),(3,'Arjun Kumar','arjun@gmail.com','9876543212',30,'Male'),(4,'Sneha Rao','sneha@gmail.com','9876543213',27,'Female'),(5,'Karthik Singh','karthik@gmail.com','9876543214',24,'Male'),(6,'Ananya Patel','ananya@gmail.com','9876543215',21,'Female'),(7,'Vikram Reddy','vikram@gmail.com','9876543216',35,'Male'),(8,'Meghana Das','meghana@gmail.com','9876543217',28,'Female'),(9,'Rohit Verma','rohit@gmail.com','9876543218',32,'Male'),(10,'Divya Sharma','divya@gmail.com','9876543219',26,'Female');
-/*!40000 ALTER TABLE `passenger` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE TICKET (
+    ticket_id INT PRIMARY KEY AUTO_INCREMENT,
+    reservation_id INT NOT NULL,
+    ticket_number VARCHAR(30) NOT NULL,
+    fare DECIMAL(10,2),
+    booking_date DATE NOT NULL,
+    FOREIGN KEY (reservation_id) REFERENCES RESERVATION(reservation_id),
+    UNIQUE (reservation_id)
+);
 
---
--- Temporary view structure for view `passenger_ticket_details`
---
+-- 3. DATA
+INSERT INTO PASSENGER VALUES
+(1,'Rahul Sharma','rahul@gmail.com','9876543210',25,'Male'),
+(2,'Priya Reddy','priya@gmail.com','9876543211',22,'Female'),
+(3,'Arjun Kumar','arjun@gmail.com','9876543212',30,'Male'),
+(4,'Sneha Rao','sneha@gmail.com','9876543213',27,'Female'),
+(5,'Karthik Singh','karthik@gmail.com','9876543214',24,'Male'),
+(6,'Ananya Patel','ananya@gmail.com','9876543215',21,'Female'),
+(7,'Vikram Reddy','vikram@gmail.com','9876543216',35,'Male'),
+(8,'Meghana Das','meghana@gmail.com','9876543217',28,'Female'),
+(9,'Rohit Verma','rohit@gmail.com','9876543218',32,'Male'),
+(10,'Divya Sharma','divya@gmail.com','9876543219',26,'Female');
 
-DROP TABLE IF EXISTS `passenger_ticket_details`;
-/*!50001 DROP VIEW IF EXISTS `passenger_ticket_details`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `passenger_ticket_details` AS SELECT 
- 1 AS `passenger_id`,
- 1 AS `passenger_name`,
- 1 AS `train_number`,
- 1 AS `train_name`,
- 1 AS `journey_date`,
- 1 AS `seat_number`,
- 1 AS `travel_class`,
- 1 AS `status`,
- 1 AS `ticket_number`,
- 1 AS `fare`,
- 1 AS `booking_date`*/;
-SET character_set_client = @saved_cs_client;
+INSERT INTO TRAIN VALUES
+(1,'12701','Hussain Sagar Express',1200,'Express'),
+(2,'12702','Godavari Express',1200,'Superfast'),
+(3,'12603','Charminar Express',1000,'Express'),
+(4,'12723','Telangana Express',1500,'Superfast'),
+(5,'17015','Visakha Express',1200,'Express'),
+(6,'12759','Charminar SF Express',1400,'Superfast'),
+(7,'12861','Visakhapatnam Express',1300,'Express'),
+(8,'12727','Godavari SF Express',1400,'Superfast'),
+(9,'17011','Hyderabad Intercity',1000,'Intercity'),
+(10,'12785','Kacheguda Express',1200,'Express');
 
---
--- Table structure for table `reservation`
---
+INSERT INTO STATION VALUES
+(1,'Secunderabad Junction','SC','Hyderabad','Telangana'),
+(2,'Hyderabad Deccan','HYB','Hyderabad','Telangana'),
+(3,'Kacheguda','KCG','Hyderabad','Telangana'),
+(4,'Vijayawada Junction','BZA','Vijayawada','Andhra Pradesh'),
+(5,'Warangal','WL','Warangal','Telangana'),
+(6,'Kazipet Junction','KZJ','Kazipet','Telangana'),
+(7,'Guntur Junction','GNT','Guntur','Andhra Pradesh'),
+(8,'Visakhapatnam Junction','VSKP','Visakhapatnam','Andhra Pradesh'),
+(9,'Tirupati','TPTY','Tirupati','Andhra Pradesh'),
+(10,'Nalgonda','NLDA','Nalgonda','Telangana');
 
-DROP TABLE IF EXISTS `reservation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `reservation` (
-  `reservation_id` int NOT NULL AUTO_INCREMENT,
-  `passenger_id` int NOT NULL,
-  `train_id` int NOT NULL,
-  `journey_date` date NOT NULL,
-  `seat_number` varchar(10) DEFAULT NULL,
-  `travel_class` varchar(30) DEFAULT NULL,
-  `status` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`reservation_id`),
-  KEY `passenger_id` (`passenger_id`),
-  KEY `train_id` (`train_id`),
-  CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`passenger_id`) REFERENCES `passenger` (`passenger_id`),
-  CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`train_id`) REFERENCES `train` (`train_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+INSERT INTO ROUTE VALUES
+(1,1,1,1,'06:00:00','06:10:00'),
+(2,1,4,2,'10:30:00','10:40:00'),
+(3,2,1,1,'07:00:00','07:10:00'),
+(4,2,5,2,'09:30:00','09:40:00'),
+(5,3,2,1,'08:00:00','08:10:00'),
+(6,3,7,2,'12:00:00','12:10:00'),
+(7,4,1,1,'09:00:00','09:10:00'),
+(8,4,8,2,'15:30:00','15:40:00'),
+(9,5,3,1,'11:00:00','11:10:00'),
+(10,5,9,2,'17:00:00','17:10:00');
 
---
--- Dumping data for table `reservation`
---
+INSERT INTO RESERVATION
+(reservation_id,passenger_id,train_id,journey_date,seat_number,travel_class,status)
+VALUES
+(1,1,1,'2026-09-10','A1-01','AC First Class','Confirmed'),
+(2,2,2,'2026-09-11','B2-15','AC 2 Tier','Confirmed'),
+(3,3,3,'2026-09-12','C1-20','AC 3 Tier','Confirmed'),
+(4,4,4,'2026-09-13','S1-10','Sleeper','Confirmed'),
+(5,5,5,'2026-09-14','A2-05','AC 2 Tier','Pending'),
+(6,6,6,'2026-09-15','S2-25','Sleeper','Confirmed'),
+(7,7,7,'2026-09-16','B1-12','AC 2 Tier','Cancelled'),
+(8,8,8,'2026-09-17','C2-18','AC 3 Tier','Confirmed'),
+(9,9,9,'2026-09-18','S3-30','Sleeper','Confirmed'),
+(10,10,10,'2026-09-19','A1-08','AC First Class','Pending');
 
-LOCK TABLES `reservation` WRITE;
-/*!40000 ALTER TABLE `reservation` DISABLE KEYS */;
-INSERT INTO `reservation` VALUES (1,1,1,'2026-09-10','A1-01','AC First Class','Confirmed'),(2,2,2,'2026-09-11','B2-15','AC 2 Tier','Confirmed'),(3,3,3,'2026-09-12','C1-20','AC 3 Tier','Confirmed'),(4,4,4,'2026-09-13','S1-10','Sleeper','Confirmed'),(5,5,5,'2026-09-14','A2-05','AC 2 Tier','Pending'),(6,6,6,'2026-09-15','S2-25','Sleeper','Confirmed'),(7,7,7,'2026-09-16','B1-12','AC 2 Tier','Cancelled'),(8,8,8,'2026-09-17','C2-18','AC 3 Tier','Confirmed'),(9,9,9,'2026-09-18','S3-30','Sleeper','Confirmed'),(10,10,10,'2026-09-19','A1-08','AC First Class','Cancelled'),(11,1,1,'2026-09-25','A1-15','AC First Class','Cancelled'),(12,2,2,'2026-09-30','B1-20','AC 2 Tier','Cancelled'),(14,3,3,'2026-10-05','C1-25','AC 3 Tier','Cancelled');
-/*!40000 ALTER TABLE `reservation` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_reservation_cancel` AFTER UPDATE ON `reservation` FOR EACH ROW BEGIN
-    IF NEW.status = 'Cancelled' AND OLD.status <> 'Cancelled' THEN
-        DELETE FROM TICKET
-        WHERE reservation_id = NEW.reservation_id;
-    END IF;
-END */;;
+INSERT INTO TICKET
+(reservation_id,ticket_number,fare,booking_date)
+VALUES
+(1,'TKT10001',850.00,'2026-09-04'),
+(2,'TKT10002',1250.00,'2026-09-04'),
+(3,'TKT10003',950.00,'2026-09-04'),
+(4,'TKT10004',650.00,'2026-09-04'),
+(5,'TKT10005',1400.00,'2026-09-04'),
+(6,'TKT10006',720.00,'2026-09-04'),
+(7,'TKT10007',1100.00,'2026-09-04'),
+(8,'TKT10008',980.00,'2026-09-04'),
+(9,'TKT10009',600.00,'2026-09-04'),
+(10,'TKT10010',1500.00,'2026-09-04');
+
+-- 4. BASIC AND JOIN QUERIES
+SELECT * FROM PASSENGER;
+SELECT * FROM TRAIN;
+SELECT * FROM STATION;
+SELECT * FROM ROUTE;
+SELECT * FROM RESERVATION;
+SELECT * FROM TICKET;
+
+SELECT t.train_number,t.train_name,s.station_name,r.stop_number,
+       r.arrival_time,r.departure_time
+FROM TRAIN t
+JOIN ROUTE r ON t.train_id=r.train_id
+JOIN STATION s ON r.station_id=s.station_id
+ORDER BY t.train_id,r.stop_number;
+
+SELECT DISTINCT t.train_number,t.train_name
+FROM TRAIN t
+JOIN ROUTE r1 ON t.train_id=r1.train_id
+JOIN ROUTE r2 ON t.train_id=r2.train_id
+JOIN STATION s1 ON r1.station_id=s1.station_id
+JOIN STATION s2 ON r2.station_id=s2.station_id
+WHERE s1.station_name='Secunderabad Junction'
+AND s2.station_name='Vijayawada Junction'
+AND r1.stop_number<r2.stop_number;
+
+SELECT p.name AS passenger_name,t.train_number,t.train_name,
+       r.journey_date,r.seat_number,r.travel_class,r.status,
+       tk.ticket_number,tk.fare,tk.booking_date
+FROM PASSENGER p
+JOIN RESERVATION r ON p.passenger_id=r.passenger_id
+JOIN TRAIN t ON r.train_id=t.train_id
+JOIN TICKET tk ON r.reservation_id=tk.reservation_id;
+
+-- 5. AGGREGATES AND REPORTS
+SELECT status,COUNT(*) AS total_reservations
+FROM RESERVATION GROUP BY status;
+
+SELECT gender,COUNT(*) AS total_passengers
+FROM PASSENGER GROUP BY gender;
+
+SELECT t.train_id,t.train_number,t.train_name,t.total_seats,
+       COUNT(CASE WHEN r.status='Confirmed' THEN 1 END) AS confirmed_bookings,
+       t.total_seats-COUNT(CASE WHEN r.status='Confirmed' THEN 1 END) AS available_seats
+FROM TRAIN t
+LEFT JOIN RESERVATION r ON t.train_id=r.train_id
+GROUP BY t.train_id,t.train_number,t.train_name,t.total_seats;
+
+SELECT SUM(tk.fare) AS total_revenue
+FROM TICKET tk JOIN RESERVATION r
+ON tk.reservation_id=r.reservation_id
+WHERE r.status='Confirmed';
+
+SELECT t.train_name,SUM(tk.fare) AS revenue
+FROM TRAIN t
+JOIN RESERVATION r ON t.train_id=r.train_id
+JOIN TICKET tk ON r.reservation_id=tk.reservation_id
+WHERE r.status='Confirmed'
+GROUP BY t.train_id,t.train_name;
+
+SELECT * FROM PASSENGER WHERE age>25;
+SELECT * FROM PASSENGER WHERE age BETWEEN 20 AND 30;
+SELECT * FROM RESERVATION WHERE status='Cancelled';
+SELECT * FROM TICKET ORDER BY fare DESC LIMIT 1;
+
+-- 6. SUBQUERIES
+SELECT * FROM PASSENGER
+WHERE age>(SELECT AVG(age) FROM PASSENGER);
+
+SELECT * FROM TICKET
+WHERE fare=(SELECT MAX(fare) FROM TICKET);
+
+SELECT t.train_number,t.train_name,COUNT(r.reservation_id) AS confirmed_bookings
+FROM TRAIN t JOIN RESERVATION r ON t.train_id=r.train_id
+WHERE r.status='Confirmed'
+GROUP BY t.train_id,t.train_number,t.train_name
+HAVING COUNT(r.reservation_id)>1;
+
+-- 7. VIEWS
+CREATE VIEW confirmed_bookings AS
+SELECT r.reservation_id,p.name AS passenger_name,
+       t.train_number,t.train_name,r.journey_date,
+       r.seat_number,r.travel_class,r.status
+FROM RESERVATION r
+JOIN PASSENGER p ON r.passenger_id=p.passenger_id
+JOIN TRAIN t ON r.train_id=t.train_id
+WHERE r.status='Confirmed';
+
+CREATE VIEW passenger_ticket_details AS
+SELECT p.passenger_id,p.name AS passenger_name,
+       t.train_number,t.train_name,r.journey_date,
+       r.seat_number,r.travel_class,r.status,
+       tk.ticket_number,tk.fare,tk.booking_date
+FROM PASSENGER p
+JOIN RESERVATION r ON p.passenger_id=r.passenger_id
+JOIN TRAIN t ON r.train_id=t.train_id
+JOIN TICKET tk ON r.reservation_id=tk.reservation_id;
+
+SELECT * FROM confirmed_bookings;
+SELECT * FROM passenger_ticket_details;
+
+-- 8. STORED PROCEDURE: FIND TRAINS
+DELIMITER //
+CREATE PROCEDURE find_trains(
+    IN source_station VARCHAR(100),
+    IN destination_station VARCHAR(100)
+)
+BEGIN
+    SELECT DISTINCT t.train_number,t.train_name
+    FROM TRAIN t
+    JOIN ROUTE r1 ON t.train_id=r1.train_id
+    JOIN ROUTE r2 ON t.train_id=r2.train_id
+    JOIN STATION s1 ON r1.station_id=s1.station_id
+    JOIN STATION s2 ON r2.station_id=s2.station_id
+    WHERE s1.station_name=source_station
+      AND s2.station_name=destination_station
+      AND r1.stop_number<r2.stop_number;
+END //
 DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
---
--- Table structure for table `route`
---
-
-DROP TABLE IF EXISTS `route`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `route` (
-  `route_id` int NOT NULL,
-  `train_id` int NOT NULL,
-  `station_id` int NOT NULL,
-  `stop_number` int DEFAULT NULL,
-  `arrival_time` time DEFAULT NULL,
-  `departure_time` time DEFAULT NULL,
-  PRIMARY KEY (`route_id`),
-  KEY `train_id` (`train_id`),
-  KEY `station_id` (`station_id`),
-  CONSTRAINT `route_ibfk_1` FOREIGN KEY (`train_id`) REFERENCES `train` (`train_id`),
-  CONSTRAINT `route_ibfk_2` FOREIGN KEY (`station_id`) REFERENCES `station` (`station_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `route`
---
-
-LOCK TABLES `route` WRITE;
-/*!40000 ALTER TABLE `route` DISABLE KEYS */;
-INSERT INTO `route` VALUES (1,1,1,1,'06:00:00','06:10:00'),(2,1,4,2,'10:30:00','10:40:00'),(3,2,1,1,'07:00:00','07:10:00'),(4,2,5,2,'09:30:00','09:40:00'),(5,3,2,1,'08:00:00','08:10:00'),(6,3,7,2,'12:00:00','12:10:00'),(7,4,1,1,'09:00:00','09:10:00'),(8,4,8,2,'15:30:00','15:40:00'),(9,5,3,1,'11:00:00','11:10:00'),(10,5,9,2,'17:00:00','17:10:00');
-/*!40000 ALTER TABLE `route` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `station`
---
-
-DROP TABLE IF EXISTS `station`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `station` (
-  `station_id` int NOT NULL,
-  `station_name` varchar(100) NOT NULL,
-  `station_code` varchar(10) NOT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `state` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`station_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `station`
---
-
-LOCK TABLES `station` WRITE;
-/*!40000 ALTER TABLE `station` DISABLE KEYS */;
-INSERT INTO `station` VALUES (1,'Secunderabad Junction','SC','Hyderabad','Telangana'),(2,'Hyderabad Deccan','HYB','Hyderabad','Telangana'),(3,'Kacheguda','KCG','Hyderabad','Telangana'),(4,'Vijayawada Junction','BZA','Vijayawada','Andhra Pradesh'),(5,'Warangal','WL','Warangal','Telangana'),(6,'Kazipet Junction','KZJ','Kazipet','Telangana'),(7,'Guntur Junction','GNT','Guntur','Andhra Pradesh'),(8,'Visakhapatnam Junction','VSKP','Visakhapatnam','Andhra Pradesh'),(9,'Tirupati','TPTY','Tirupati','Andhra Pradesh'),(10,'Nalgonda','NLDA','Nalgonda','Telangana');
-/*!40000 ALTER TABLE `station` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `ticket`
---
-
-DROP TABLE IF EXISTS `ticket`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ticket` (
-  `ticket_id` int NOT NULL AUTO_INCREMENT,
-  `reservation_id` int NOT NULL,
-  `ticket_number` varchar(30) NOT NULL,
-  `fare` decimal(10,2) DEFAULT NULL,
-  `booking_date` date NOT NULL,
-  PRIMARY KEY (`ticket_id`),
-  UNIQUE KEY `unique_reservation_ticket` (`reservation_id`),
-  CONSTRAINT `ticket_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `ticket`
---
-
-LOCK TABLES `ticket` WRITE;
-/*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
-INSERT INTO `ticket` VALUES (1,1,'TKT10001',850.00,'2026-09-04'),(2,2,'TKT10002',1250.00,'2026-09-04'),(3,3,'TKT10003',950.00,'2026-09-04'),(4,4,'TKT10004',650.00,'2026-09-04'),(5,5,'TKT10005',1400.00,'2026-09-04'),(6,6,'TKT10006',720.00,'2026-09-04'),(8,8,'TKT10008',980.00,'2026-09-04'),(9,9,'TKT10009',600.00,'2026-09-04');
-/*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `train`
---
-
-DROP TABLE IF EXISTS `train`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `train` (
-  `train_id` int NOT NULL,
-  `train_number` varchar(20) NOT NULL,
-  `train_name` varchar(100) NOT NULL,
-  `total_seats` int NOT NULL,
-  `train_type` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`train_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `train`
---
-
-LOCK TABLES `train` WRITE;
-/*!40000 ALTER TABLE `train` DISABLE KEYS */;
-INSERT INTO `train` VALUES (1,'12701','Hussain Sagar Express',1200,'Express'),(2,'12702','Godavari Express',1200,'Superfast'),(3,'12603','Charminar Express',1000,'Express'),(4,'12723','Telangana Express',1500,'Superfast'),(5,'17015','Visakha Express',1200,'Express'),(6,'12759','Charminar SF Express',1400,'Superfast'),(7,'12861','Visakhapatnam Express',1300,'Express'),(8,'12727','Godavari SF Express',1400,'Superfast'),(9,'17011','Hyderabad Intercity',1000,'Intercity'),(10,'12785','Kacheguda Express',1200,'Express');
-/*!40000 ALTER TABLE `train` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Dumping routines for database 'railway_reservation'
---
-/*!50003 DROP PROCEDURE IF EXISTS `book_ticket` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `book_ticket`(
+-- 9. STORED PROCEDURE: BOOK TICKET
+DELIMITER //
+CREATE PROCEDURE book_ticket(
     IN p_passenger_id INT,
     IN p_train_id INT,
     IN p_journey_date DATE,
@@ -274,160 +271,71 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `book_ticket`(
 )
 BEGIN
     DECLARE seat_count INT;
-
-    SELECT COUNT(*)
-    INTO seat_count
+    SELECT COUNT(*) INTO seat_count
     FROM RESERVATION
-    WHERE train_id = p_train_id
-      AND journey_date = p_journey_date
-      AND seat_number = p_seat_number
-      AND status = 'Confirmed';
+    WHERE train_id=p_train_id
+      AND journey_date=p_journey_date
+      AND seat_number=p_seat_number
+      AND status='Confirmed';
 
-    IF seat_count > 0 THEN
+    IF seat_count>0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Seat is already booked';
+        SET MESSAGE_TEXT='Seat is already booked';
     ELSE
         INSERT INTO RESERVATION
-        (passenger_id, train_id, journey_date, seat_number, travel_class, status)
+        (passenger_id,train_id,journey_date,seat_number,travel_class,status)
         VALUES
-        (p_passenger_id, p_train_id, p_journey_date,
-         p_seat_number, p_travel_class, 'Confirmed');
+        (p_passenger_id,p_train_id,p_journey_date,p_seat_number,p_travel_class,'Confirmed');
     END IF;
-END ;;
+END //
 DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `cancel_reservation` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `cancel_reservation`(
-    IN p_reservation_id INT
-)
-BEGIN
-    UPDATE RESERVATION
-    SET status = 'Cancelled'
-    WHERE reservation_id = p_reservation_id;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `find_trains` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `find_trains`(
-    IN source_station VARCHAR(100),
-    IN destination_station VARCHAR(100)
-)
-BEGIN
-    SELECT DISTINCT
-        t.train_number,
-        t.train_name
-    FROM TRAIN t
-    JOIN ROUTE r1
-        ON t.train_id = r1.train_id
-    JOIN ROUTE r2
-        ON t.train_id = r2.train_id
-    JOIN STATION s1
-        ON r1.station_id = s1.station_id
-    JOIN STATION s2
-        ON r2.station_id = s2.station_id
-    WHERE s1.station_name = source_station
-      AND s2.station_name = destination_station
-      AND r1.stop_number < r2.stop_number;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `generate_ticket` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `generate_ticket`(
+
+-- 10. STORED PROCEDURE: GENERATE TICKET
+DELIMITER //
+CREATE PROCEDURE generate_ticket(
     IN p_reservation_id INT,
     IN p_ticket_number VARCHAR(30),
     IN p_fare DECIMAL(10,2)
 )
 BEGIN
     INSERT INTO TICKET
-    (reservation_id, ticket_number, fare, booking_date)
+    (reservation_id,ticket_number,fare,booking_date)
     VALUES
-    (p_reservation_id, p_ticket_number, p_fare, CURDATE());
-END ;;
+    (p_reservation_id,p_ticket_number,p_fare,CURDATE());
+END //
 DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
---
--- Final view structure for view `confirmed_bookings`
---
+-- 11. STORED PROCEDURE: CANCEL RESERVATION
+DELIMITER //
+CREATE PROCEDURE cancel_reservation(IN p_reservation_id INT)
+BEGIN
+    UPDATE RESERVATION
+    SET status='Cancelled'
+    WHERE reservation_id=p_reservation_id;
+END //
+DELIMITER ;
 
-/*!50001 DROP VIEW IF EXISTS `confirmed_bookings`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `confirmed_bookings` AS select `r`.`reservation_id` AS `reservation_id`,`p`.`name` AS `passenger_name`,`t`.`train_number` AS `train_number`,`t`.`train_name` AS `train_name`,`r`.`journey_date` AS `journey_date`,`r`.`seat_number` AS `seat_number`,`r`.`travel_class` AS `travel_class`,`r`.`status` AS `status` from ((`reservation` `r` join `passenger` `p` on((`r`.`passenger_id` = `p`.`passenger_id`))) join `train` `t` on((`r`.`train_id` = `t`.`train_id`))) where (`r`.`status` = 'Confirmed') */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
+-- 12. TRIGGER
+DELIMITER //
+CREATE TRIGGER after_reservation_cancel
+AFTER UPDATE ON RESERVATION
+FOR EACH ROW
+BEGIN
+    IF NEW.status='Cancelled' AND OLD.status<>'Cancelled' THEN
+        DELETE FROM TICKET
+        WHERE reservation_id=NEW.reservation_id;
+    END IF;
+END //
+DELIMITER ;
 
---
--- Final view structure for view `passenger_ticket_details`
---
+-- 13. PROCEDURE EXAMPLES
+CALL find_trains('Secunderabad Junction','Warangal');
 
-/*!50001 DROP VIEW IF EXISTS `passenger_ticket_details`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `passenger_ticket_details` AS select `p`.`passenger_id` AS `passenger_id`,`p`.`name` AS `passenger_name`,`t`.`train_number` AS `train_number`,`t`.`train_name` AS `train_name`,`r`.`journey_date` AS `journey_date`,`r`.`seat_number` AS `seat_number`,`r`.`travel_class` AS `travel_class`,`r`.`status` AS `status`,`tk`.`ticket_number` AS `ticket_number`,`tk`.`fare` AS `fare`,`tk`.`booking_date` AS `booking_date` from (((`passenger` `p` join `reservation` `r` on((`p`.`passenger_id` = `r`.`passenger_id`))) join `train` `t` on((`r`.`train_id` = `t`.`train_id`))) join `ticket` `tk` on((`r`.`reservation_id` = `tk`.`reservation_id`))) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+-- 14. VERIFICATION
+SHOW TABLES;
+SHOW FULL TABLES WHERE Table_type='BASE TABLE';
+SHOW FULL TABLES WHERE Table_type='VIEW';
+SHOW PROCEDURE STATUS WHERE Db='railway_reservation';
+SHOW TRIGGERS;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-09-12 19:18:22
+-- END OF PROJECT
